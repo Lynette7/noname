@@ -362,4 +362,7 @@ pub enum ErrorKind {
 
     #[error("division by zero")]
     DivisionByZero,
+
+    #[error("the identifier `{0}` cannot be used because it is a reserved keyword")]
+    ReservedKeywordAsIdent(String),
 }

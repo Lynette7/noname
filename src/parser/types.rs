@@ -670,10 +670,20 @@ impl Ident {
     pub fn parse(ctx: &mut ParserCtx, tokens: &mut Tokens) -> Result<Self> {
         let token = tokens.bump_err(ctx, ErrorKind::MissingToken)?;
         match token.kind {
-            TokenKind::Identifier(ident) => Ok(Self {
-                value: ident,
-                span: token.span,
-            }),
+            TokenKind::Identifier(ident) => {
+                // Use the Keyword::parse function to check if the identifier is a reserved keyword
+                if crate::lexer::Keyword::parse(&ident).is_some() {
+                    return Err(ctx.error(
+                        ErrorKind::ReservedKeywordAsIdent(ident.clone()),
+                        token.span,
+                    ));
+                }
+
+                Ok(Self {
+                    value: ident,
+                    span: token.span,
+                })
+            }
 
             _ => Err(ctx.error(
                 ErrorKind::ExpectedToken(TokenKind::Identifier("".to_string())),
